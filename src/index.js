@@ -9,16 +9,19 @@ import 'bootstrap-css-only/css/bootstrap.min.css';
 import 'mdbreact/dist/css/mdb.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import './global.css';
+import { WalletSelectorContextProvider } from './contexts/WalletSelectorContext';
 
-window.nearInitPromise = initContract()
-  .then(() => {
+// window.nearInitPromise = initContract()
+//   .then(() => {
     ReactDOM.render(
       <ContainerProvider>
         <DaosContextProvider>
-          <App />
+          <WalletSelectorContextProvider>
+            <App />
+          </WalletSelectorContextProvider>
         </DaosContextProvider>
       </ContainerProvider>,
       document.querySelector('#root')
     );
-  })
-  .catch(console.error);
+  // })
+  // .catch(console.error);

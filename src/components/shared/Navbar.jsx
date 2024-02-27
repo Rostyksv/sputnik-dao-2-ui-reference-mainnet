@@ -8,12 +8,13 @@ import {
   MDBNavbarToggler,
   MDBCollapse
 } from 'mdbreact';
+import { useWalletSelector } from '../../contexts/WalletSelectorContext'
 import { BrowserRouter as Router } from 'react-router-dom';
-import { login, logout } from '../../utils/utils';
 import { useGlobalState, useGlobalMutation } from '../../utils/container';
 import useRouter from '../../utils/use-router';
 import useChangeDao from '../../hooks/useChangeDao';
-import DaoSearch from './DaoSearch';
+
+import "@near-wallet-selector/modal-ui/styles.css"
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,8 +24,29 @@ const Navbar = () => {
 
   const handleDaoChange = useChangeDao({ routerCtx, mutationCtx });
 
+  const { modal, selector, accountId } = useWalletSelector();
+
+  const isSignedIn = selector?.isSignedIn();
+
   const toggleCollapse = () => {
     setIsOpen(!isOpen);
+  };
+
+  const handleSignIn = async () => {
+    console.log(modal, 'modal1');
+
+    if(selector) {
+      modal.show();
+    }
+  }
+
+  const handleSignOut = async () => {
+    const wallet = await selector.wallet();
+
+    wallet.signOut().catch((err) => {
+      console.log("Failed to sign out");
+      console.error(err);
+    });
   };
 
   return (
@@ -50,19 +72,19 @@ const Navbar = () => {
           </MDBNavbarNav>
           <MDBNavbarNav right>
             <MDBNavItem>{/* <DaoSearch /> */}</MDBNavItem>
-            {!window.walletConnection.isSignedIn() ? (
+            {!isSignedIn ? (
               <MDBNavItem active>
-                <MDBNavLink to="#" onClick={login}>
+                <MDBNavLink to="#" onClick={handleSignIn}>
                   Sign In
                 </MDBNavLink>
               </MDBNavItem>
             ) : (
               <>
                 <MDBNavItem active>
-                  <MDBNavbarBrand>{window.accountId}</MDBNavbarBrand>
+                  <MDBNavbarBrand>{accountId}</MDBNavbarBrand>
                 </MDBNavItem>
                 <MDBNavItem active>
-                  <MDBNavLink to="#" onClick={logout}>
+                  <MDBNavLink to="#" onClick={handleSignOut}>
                     Sign Out
                   </MDBNavLink>
                 </MDBNavItem>

@@ -39,6 +39,9 @@
     "shelljs": "~0.8.4"
   },
   "dependencies": {
+    "@near-wallet-selector/core": "^8.9.5",
+    "@near-wallet-selector/modal-ui": "^8.9.5",
+    "@near-wallet-selector/my-near-wallet": "^8.9.5",
     "decimal.js": "^10.2.1",
     "markdown-it": "^13.0.1",
     "mdbreact": "^5.0.0",
@@ -53,6 +56,7 @@
     "react-router-dom": "^5.2.0",
     "react-transition-group": "^4.4.5",
     "regenerator-runtime": "^0.13.11",
+    "rxjs": "^7.8.1",
     "stringify-object": "^3.3.0",
     "utils": "^0.3.1"
   },

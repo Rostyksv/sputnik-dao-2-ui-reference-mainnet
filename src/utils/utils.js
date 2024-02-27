@@ -14,6 +14,7 @@ export async function initContract() {
   );
   window.walletConnection = new WalletConnection(near);
   window.accountId = window.walletConnection.getAccountId();
+  console.log(window.accountId, window.walletConnection.account(), 'win1');
   window.factoryContract = await new Contract(
     window.walletConnection.account(),
     nearConfig.contractName,
@@ -24,23 +25,23 @@ export async function initContract() {
   );
 }
 
-export function logout() {
-  window.walletConnection.signOut();
-  window.location.replace(window.location.origin + window.location.pathname);
-}
-
-export function login({ redirectToCreateDao } = { redirectToCreateDao: false }) {
-  const successUrl = redirectToCreateDao
-    ? window.location.origin + '/?createdao=true'
-    : window.location.origin + window.location.pathname;
-
-  const signInConfig = {
-    contractId: nearConfig.contractName,
-    successUrl
-  };
-
-  window.walletConnection.requestSignIn(signInConfig);
-}
+// export function logout() {
+//   window.walletConnection.signOut();
+//   window.location.replace(window.location.origin + window.location.pathname);
+// }
+//
+// export function login({ redirectToCreateDao } = { redirectToCreateDao: false }) {
+//   const successUrl = redirectToCreateDao
+//     ? window.location.origin + '/?createdao=true'
+//     : window.location.origin + window.location.pathname;
+//
+//   const signInConfig = {
+//     contractId: nearConfig.contractName,
+//     successUrl: window.location.origin + '/?createdao=true',
+//   };
+//
+//   window.walletConnection.requestSignIn(signInConfig);
+// }
 
 export const provider = new nearApi.providers.JsonRpcProvider(nearConfig.nodeUrl);
 export const connection = new nearApi.Connection(nearConfig.nodeUrl, provider, {});

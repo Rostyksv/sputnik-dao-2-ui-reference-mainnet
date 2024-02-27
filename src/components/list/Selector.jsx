@@ -22,6 +22,7 @@ import { login, accountExists, nearConfig } from '../../utils/utils';
 import NewDao from './NewDao';
 import { useDaoList } from '../../hooks/useDaoList';
 import { useDaoCount } from '../../hooks/useDaoCount';
+import { useWalletSelector } from '../../contexts/WalletSelectorContext';
 
 const DaoInfo = (props) => {
   const contractId = props.item;
@@ -32,17 +33,17 @@ const DaoInfo = (props) => {
   const [daoState, setDaoState] = useState(null);
   const [daoExists, setDaoExists] = useState(true);
 
-  const contract = new Contract(window.walletConnection.account(), contractId, {
-    viewMethods: [
-      'get_config',
-      'get_policy',
-      'get_staking_contract',
-      'get_available_amount',
-      'delegation_total_supply',
-      'get_last_proposal_id'
-    ],
-    changeMethods: []
-  });
+  // const contract = new Contract(window.walletConnection.account(), contractId, {
+  //   viewMethods: [
+  //     'get_config',
+  //     'get_policy',
+  //     'get_staking_contract',
+  //     'get_available_amount',
+  //     'delegation_total_supply',
+  //     'get_last_proposal_id'
+  //   ],
+  //   changeMethods: []
+  // });
 
   useEffect(() => {
     if (contractId !== '') {
@@ -220,9 +221,9 @@ const DaoInfo = (props) => {
   );
 };
 
-async function getDaos(fromIndex, limit) {
-  return await window.factoryContract.get_daos({ from_index: fromIndex, limit: limit });
-}
+// async function getDaos(fromIndex, limit) {
+//   return await window.factoryContract.get_daos({ from_index: fromIndex, limit: limit });
+// }
 
 const Selector = (props) => {
   const routerCtx = useRouter();
@@ -235,6 +236,10 @@ const Selector = (props) => {
   const [daoListFixed, setDaoListFixed] = useState([]);
   const [showNewDaoModal, setShowNewDaoModal] = useState(false);
   const query = useQuery();
+
+  const { modal, selector, accountId } = useWalletSelector();
+
+  const isSignedIn = selector?.isSignedIn();
 
   useEffect(() => {
     console.log(query.get('createdao'));
@@ -260,14 +265,15 @@ const Selector = (props) => {
   };
 
   const toggleNewDao = () => {
-    if (!window.walletConnection.getAccountId()) {
-      login({ redirectToCreateDao: true });
-      return;
+    console.log(accountId, selector, '55555');
+    if (!accountId && selector) {
+      // login({ redirectToCreateDao: true });
+      return modal.show();
     }
 
     setShowNewDaoModal(!showNewDaoModal);
   };
-
+console.log(showNewDaoModal, 'showNewDaoModal')
   const togglePage = (i) => {
     setFromIndex(i);
   };

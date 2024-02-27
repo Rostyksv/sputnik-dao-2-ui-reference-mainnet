@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { accountExists, nearConfig } from '../../utils/utils';
 import { MDBBtn, MDBInput, MDBModal, MDBModalBody, MDBModalFooter, MDBModalHeader } from 'mdbreact';
 import { Decimal } from 'decimal.js';
 import { yoktoNear } from '../../utils/funcs';
-
+import { connect, keyStores, providers, utils, WalletConnection, Contract } from 'near-api-js';
+import { useWalletSelector } from '../../contexts/WalletSelectorContext';
+import BN from 'bn.js';
 const NewDao = (props) => {
   const [showSpinner, setShowSpinner] = useState(false);
   const [showNewDao, setShowNewDao] = useState(true);
@@ -34,11 +36,14 @@ const NewDao = (props) => {
     setShowNewDao(!showNewDao);
   };
 
+  const { selector, accountId, provider } = useWalletSelector();
+
   const submitNewDao = async (e) => {
     e.preventDefault();
     e.persist();
     const nearAccountValid = await accountExists(council.value);
-
+console.log(council, 'cou1');
+console.log(nearAccountValid, 'valid1');
     let validatePurpose = validateField('purpose', purpose.value);
     let validateDaoName = validateField('daoName', daoName.value);
     let validateAmount = validateField('amount', amount.value);
@@ -87,24 +92,53 @@ const NewDao = (props) => {
         policy: [council.value]
       };
 
-      //console.log(argsList, Buffer.from(JSON.stringify(argsList)).toString('base64'));
+      // console.log(argsList, Buffer.from(JSON.stringify(argsList)).toString('base64'), '00000');
 
       try {
         setShowSpinner(true);
         const a = new Decimal(amount.value);
         const amountYokto = a.mul(yoktoNear).toFixed();
         const args = Buffer.from(JSON.stringify(argsList)).toString('base64');
+console.log(args, daoName, 'args1');
 
-        await window.factoryContract.create({
-          args: {
-            name: daoName.value,
-            public_key: nearConfig.pk,
-            args
-          },
-          callbackUrl: `${window.location.origin}/${daoName.value}.${nearConfig.contractName}`,
-          amount: amountYokto.toString(),
-          gas: new Decimal('150000000000000').toString()
+        async function createDao(contractId, method, args) {
+          console.log(selector, 'sel33333');
+          try {
+            const wallet = await selector.wallet();
+            console.log(wallet, 'wallet');
+            console.log(amountYokto.toString(), 'amountYokto');
+
+            const result = await wallet.signAndSendTransaction({
+              actions: [
+                {
+                  type: "FunctionCall",
+                  params: {
+                    methodName: method,
+                    args,
+                    gas: new Decimal('150000000000000').toString(),
+                    deposit: amountYokto.toString(),
+                    callbackUrl: `${window.location.origin}/${daoName.value}.${nearConfig.contractName}`,
+                  },
+                }
+              ],
+            });
+console.log(result, 'res111');
+
+            return result;
+          } catch (e) {
+            console.log(e, 'eee111');
+          }
+        }
+
+        const dao = await createDao(nearConfig.contractName, "create", {
+          name: daoName.value,
+          public_key: nearConfig.pk,
+          args
         });
+
+        console.log(dao, 'dao111');
+
+        console.log('77777');
       } catch (e) {
         console.log(e);
         props.setShowError(e);
