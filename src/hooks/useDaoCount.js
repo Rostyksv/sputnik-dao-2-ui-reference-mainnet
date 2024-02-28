@@ -8,25 +8,13 @@ export const useDaoCount = (props) => {
   const mutationCtx = useGlobalMutation();
   const [daoCount, setDaoCount] = useState(0);
 
-  const { provider } = useWalletSelector();
+  const { provider, viewMethod } = useWalletSelector();
 
 
   useEffect(() => {
     (async () => {
       try {
-        async function getPublicDaosCount(contractId, method) {
-          const response = await provider.query({
-            request_type: "call_function",
-            account_id: contractId,
-            method_name: method,
-            args_base64: Buffer.from("").toString("base64"),
-            finality: "optimistic"
-          });
-
-          return JSON.parse(Buffer.from(response.result).toString())
-        }
-
-        const count = await getPublicDaosCount(nearConfig.contractName, "get_number_daos");
+        const count = await viewMethod({ method: 'get_number_daos' });
 
         if (count) {
           setDaoCount(count);

@@ -17,6 +17,8 @@ export const WalletSelectorContextProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const CONTRACT_ID = nearConfig.contractName;
+  const THIRTY_TGAS = '30000000000000';
+  const NO_DEPOSIT = '0';
 
   const init = useCallback(async () => {
     const _selector = await setupWalletSelector({
@@ -74,6 +76,41 @@ console.log(modal, '11111');
   const { network } = selector?.options || {};
   console.log(network, 'net1');
   const provider = new providers.JsonRpcProvider({ url: network?.nodeUrl });
+console.log(provider, 'pro');
+
+  async function viewMethod({ contractId = nearConfig.contractName, method, args = {} }) {
+    console.log(contractId, 'con111');
+    let res = await provider.query({
+      request_type: 'call_function',
+      account_id: contractId,
+      method_name: method,
+      args_base64: Buffer.from(JSON.stringify(args)).toString('base64'),
+      finality: 'optimistic',
+    });
+    console.log(res, 'res555');
+    return JSON.parse(Buffer.from(res.result).toString());
+  }
+
+  async function callMethod({ contractId = nearConfig.contractName, method, args = {}, gas = THIRTY_TGAS, deposit = NO_DEPOSIT }) {
+    const wallet = await selector.wallet();
+    console.log(wallet, 'wallet1');
+    const outcome = await wallet.signAndSendTransaction({
+      receiverId: contractId,
+      actions: [
+        {
+          type: 'FunctionCall',
+          params: {
+            methodName: method,
+            args,
+            gas,
+            deposit,
+          },
+        },
+      ],
+    });
+
+    return providers.getTransactionLastResult(outcome)
+  }
 
   const walletSelectorContextValue = useMemo(
     () => ({
@@ -82,6 +119,8 @@ console.log(modal, '11111');
       accounts,
       accountId: accounts.find((account) => account.active)?.accountId || null,
       provider,
+      viewMethod,
+      callMethod
     }),
     [selector, modal, accounts]
   );
