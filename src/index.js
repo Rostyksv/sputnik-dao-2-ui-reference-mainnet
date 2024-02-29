@@ -11,8 +11,6 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import './global.css';
 import { WalletSelectorContextProvider } from './contexts/WalletSelectorContext';
 
-// window.nearInitPromise = initContract()
-//   .then(() => {
     ReactDOM.render(
       <ContainerProvider>
         <DaosContextProvider>
@@ -23,5 +21,3 @@ import { WalletSelectorContextProvider } from './contexts/WalletSelectorContext'
       </ContainerProvider>,
       document.querySelector('#root')
     );
-  // })
-  // .catch(console.error);
