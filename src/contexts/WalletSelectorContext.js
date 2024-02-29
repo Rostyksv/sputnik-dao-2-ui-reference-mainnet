@@ -7,6 +7,7 @@ import Loading from '../utils/Loading';
 import { nearConfig } from '../utils/utils';
 import { distinctUntilChanged, map } from "rxjs";
 import { providers } from 'near-api-js';
+import getConfig from "../config";
 
 const WalletSelectorContext = React.createContext(null);
 
@@ -22,7 +23,7 @@ export const WalletSelectorContextProvider = ({ children }) => {
 
   const init = useCallback(async () => {
     const _selector = await setupWalletSelector({
-      network: "testnet",
+      network: getConfig(process.env.NODE_ENV || 'development')?.networkId,
       modules: [setupMyNearWallet()],
     });
     const _modal = setupModal(_selector, {
