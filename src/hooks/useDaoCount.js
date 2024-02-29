@@ -10,7 +10,6 @@ export const useDaoCount = (props) => {
 
   const { provider, viewMethod } = useWalletSelector();
 
-
   useEffect(() => {
     (async () => {
       try {

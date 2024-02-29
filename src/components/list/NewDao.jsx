@@ -42,8 +42,7 @@ const NewDao = (props) => {
     e.preventDefault();
     e.persist();
     const nearAccountValid = await accountExists(council.value);
-console.log(council, 'cou1');
-console.log(nearAccountValid, 'valid1');
+
     let validatePurpose = validateField('purpose', purpose.value);
     let validateDaoName = validateField('daoName', daoName.value);
     let validateAmount = validateField('amount', amount.value);
@@ -92,21 +91,15 @@ console.log(nearAccountValid, 'valid1');
         policy: [council.value]
       };
 
-      // console.log(argsList, Buffer.from(JSON.stringify(argsList)).toString('base64'), '00000');
-
       try {
         setShowSpinner(true);
         const a = new Decimal(amount.value);
         const amountYokto = a.mul(yoktoNear).toFixed();
         const args = Buffer.from(JSON.stringify(argsList)).toString('base64');
-console.log(args, daoName, 'args1');
 
         async function createDao(contractId, method, args) {
-          console.log(selector, 'sel33333');
           try {
             const wallet = await selector.wallet();
-            console.log(wallet, 'wallet');
-            console.log(amountYokto.toString(), 'amountYokto');
 
             const result = await wallet.signAndSendTransaction({
               actions: [
@@ -122,11 +115,10 @@ console.log(args, daoName, 'args1');
                 }
               ],
             });
-console.log(result, 'res111');
 
             return result;
           } catch (e) {
-            console.log(e, 'eee111');
+            console.log(e);
           }
         }
 
@@ -135,10 +127,6 @@ console.log(result, 'res111');
           public_key: nearConfig.pk,
           args
         });
-
-        console.log(dao, 'dao111');
-
-        console.log('77777');
       } catch (e) {
         console.log(e);
         props.setShowError(e);

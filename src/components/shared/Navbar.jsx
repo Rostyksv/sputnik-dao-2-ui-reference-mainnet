@@ -33,8 +33,6 @@ const Navbar = () => {
   };
 
   const handleSignIn = async () => {
-    console.log(modal, 'modal1');
-
     if(selector) {
       modal.show();
     }

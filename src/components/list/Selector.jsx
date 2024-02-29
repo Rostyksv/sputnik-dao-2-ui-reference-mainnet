@@ -33,18 +33,6 @@ const DaoInfo = (props) => {
   const [daoState, setDaoState] = useState(null);
   const [daoExists, setDaoExists] = useState(true);
 
-  // const contract = new Contract(window.walletConnection.account(), contractId, {
-  //   viewMethods: [
-  //     'get_config',
-  //     'get_policy',
-  //     'get_staking_contract',
-  //     'get_available_amount',
-  //     'delegation_total_supply',
-  //     'get_last_proposal_id'
-  //   ],
-  //   changeMethods: []
-  // });
-
   useEffect(() => {
     if (contractId !== '') {
       accountExists(contractId)
@@ -242,7 +230,6 @@ const Selector = (props) => {
   const isSignedIn = selector?.isSignedIn();
 
   useEffect(() => {
-    console.log(query.get('createdao'));
     if (query.get('createdao')) {
       setShowNewDaoModal(!showNewDaoModal);
     }
@@ -265,7 +252,6 @@ const Selector = (props) => {
   };
 
   const toggleNewDao = () => {
-    console.log(accountId, selector, '55555');
     if (!accountId && selector) {
       // login({ redirectToCreateDao: true });
       return modal.show();
@@ -273,7 +259,7 @@ const Selector = (props) => {
 
     setShowNewDaoModal(!showNewDaoModal);
   };
-console.log(showNewDaoModal, 'showNewDaoModal')
+
   const togglePage = (i) => {
     setFromIndex(i);
   };

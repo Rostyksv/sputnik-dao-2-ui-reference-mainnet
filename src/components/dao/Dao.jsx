@@ -210,7 +210,6 @@ const Dao = () => {
 
   let { dao } = useParams();
 
-  console.log(stateCtx, 'sta111');
   useEffect(() => {
     if (stateCtx.config.contract === '') {
       if (dao !== undefined) {
@@ -299,7 +298,7 @@ const Dao = () => {
     setNewProposalPayout(!newProposalPayout);
     setAddProposalModal(false);
   };
-console.log(newProposalCouncilMember, 'new111');
+
   const toggleNewToken = () => {
     setProposalTarget({
       value: nearConfig.tokenFactory,
@@ -368,12 +367,12 @@ console.log(newProposalCouncilMember, 'new111');
       contract: dao
     });
     let data = [];
-    console.log('get111');
+
     const proposals = await viewMethod({ contractId: stateCtx.config.contract, method: 'get_proposals', args: {
           from_index: fromIndex,
           limit: limit
         }});
-console.log(proposals, 'prop1');
+
     if(proposals) {
       data = [...proposals];
     }
@@ -389,10 +388,8 @@ console.log(proposals, 'prop1');
   }
 
   useEffect(() => {
-    console.log(isFirstRun, firstRun, 'f111');
     if (!isFirstRun) {
       const interval = setInterval(async () => {
-        console.log('loading proposals');
         getProposals().then((r) => {
           setProposals(r);
           setShowLoading(false);
@@ -401,11 +398,10 @@ console.log(proposals, 'prop1');
       return () => clearInterval(interval);
     }
   }, [firstRun]);
-console.log(numberProposals, 'numberProposals');
+
   useEffect(async () => {
     if (numberProposals) {
       getProposals().then((r) => {
-        console.log(r, 'r555');
         setProposals(r);
         setShowLoading(false);
       });
@@ -911,7 +907,6 @@ console.log(numberProposals, 'numberProposals');
     if (!urlRegex.test(string)) {
       return false;
     } else {
-      console.log(string.match(urlRegex));
       return string.match(urlRegex);
     }
   };
@@ -1043,8 +1038,11 @@ console.log(numberProposals, 'numberProposals');
           } else {
             const amountYokto = amount.mul(yoktoNear).toFixed();
             // Handle case of NEAR streams
-            await window.contract.add_proposal(
-              {
+
+            await callMethod({
+              contractId: stateCtx.config.contract,
+              method: 'add_proposal',
+              args: {
                 proposal: {
                   description: e.target.proposalDescription.value.trim(),
                   kind: {
@@ -1068,9 +1066,9 @@ console.log(numberProposals, 'numberProposals');
                   }
                 }
               },
-              new Decimal('30000000000000').toString(),
-              daoPolicy.proposal_bond.toString()
-            );
+              gas: new Decimal('30000000000000').toString(),
+              deposit: daoPolicy.proposal_bond.toString()
+            })
           }
         } catch (e) {
           console.log(e);
@@ -1339,7 +1337,6 @@ console.log(numberProposals, 'numberProposals');
         const args = Buffer.from(
           JSON.stringify(argsList).replaceAll('^"', '').replaceAll('"^', '')
         ).toString('base64');
-        //console.log(argsList);
 
         try {
           setShowSpinner(true);
@@ -1580,14 +1577,12 @@ console.log(numberProposals, 'numberProposals');
         const args = Buffer.from(
           JSON.stringify(argsList).replaceAll('^"', '').replaceAll('"^', '')
         ).toString('base64');
-        console.log(argsList);
 
         const deposit = new Decimal(e.target.proposalCustomDeposit.value);
         const depositYokto = deposit.mul(yoktoNear).toFixed();
 
         try {
           setShowSpinner(true);
-          console.log('proposal555');
 
           await callMethod({
             contractId: stateCtx.config.contract,

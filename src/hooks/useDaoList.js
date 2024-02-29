@@ -8,7 +8,7 @@ export const useDaoList = (props) => {
   const mutationCtx = useGlobalMutation();
   const [daoList, setDaoList] = useState();
 
-  const { provider, viewMethod } = useWalletSelector();
+  const { viewMethod } = useWalletSelector();
 
   useEffect(() => {
     (async () => {
@@ -17,8 +17,6 @@ export const useDaoList = (props) => {
           from_index: Math.floor(props.fromIndex * props.limit),
             limit: props.limit,
         }});
-
-        console.log(daos, 'daos5');
 
         if (daos) {
           setDaoList(daos);

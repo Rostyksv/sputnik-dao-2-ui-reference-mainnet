@@ -28,9 +28,8 @@ export const WalletSelectorContextProvider = ({ children }) => {
     const _modal = setupModal(_selector, {
       contractId: CONTRACT_ID,
     });
-    console.log(_selector, 'sel1');
+
     const state = _selector.store.getState();
-    console.log(state, 'state1');
     setAccounts(state.accounts);
 
     window.selector = _selector;
@@ -56,15 +55,12 @@ export const WalletSelectorContextProvider = ({ children }) => {
     const subscription = selector.store.observable
       .pipe(map((state) => state.accounts), distinctUntilChanged())
       .subscribe((nextAccounts) => {
-        console.log('Accounts Update', nextAccounts);
-
         setAccounts(nextAccounts);
       });
-console.log(modal, '11111');
+
     const onHideSubscription = modal && modal.on("onHide", (event) => {
-        console.log(event, 'ev1');
+        console.log(event, 'event');
       });
-    console.log('22222');
 
     return () => {
       subscription.unsubscribe();
@@ -72,28 +68,25 @@ console.log(modal, '11111');
     };
   }, [selector, modal]);
 
-  console.log(selector, 'sele1');
   const { network } = selector?.options || {};
-  console.log(network, 'net1');
   const provider = new providers.JsonRpcProvider({ url: network?.nodeUrl });
-console.log(provider, 'pro');
-
   async function viewMethod({ contractId = nearConfig.contractName, method, args = {} }) {
-    console.log(contractId, 'con111');
-    let res = await provider.query({
-      request_type: 'call_function',
-      account_id: contractId,
-      method_name: method,
-      args_base64: Buffer.from(JSON.stringify(args)).toString('base64'),
-      finality: 'optimistic',
-    });
-    console.log(res, 'res555');
-    return JSON.parse(Buffer.from(res.result).toString());
+      if(contractId) {
+        let res = await provider.query({
+          request_type: 'call_function',
+          account_id: contractId,
+          method_name: method,
+          args_base64: Buffer.from(JSON.stringify(args)).toString('base64'),
+          finality: 'optimistic',
+        });
+
+        return JSON.parse(Buffer.from(res.result).toString());
+      }
   }
 
   async function callMethod({ contractId = nearConfig.contractName, method, args = {}, gas = THIRTY_TGAS, deposit = NO_DEPOSIT }) {
     const wallet = await selector.wallet();
-    console.log(wallet, 'wallet1');
+
     const outcome = await wallet.signAndSendTransaction({
       receiverId: contractId,
       actions: [
