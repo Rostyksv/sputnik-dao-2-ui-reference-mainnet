@@ -942,15 +942,7 @@ const Dao = () => {
       let ftMetadata = null;
       if (paymentOption === 'FT') {
         try {
-          const tokenContract = new Contract(
-            window?.walletConnection?.account(),
-            e.target.proposalFT.value,
-            {
-              viewMethods: ['ft_metadata'],
-              changeMethods: []
-            }
-          );
-          ftMetadata = await tokenContract.ft_metadata({});
+          ftMetadata = await viewMethod({ contractId: e.target.proposalFT.value, method: 'ft_metadata' })
         } catch (error) {
           // nu vse
           console.log(error);
@@ -997,8 +989,10 @@ const Dao = () => {
             const tokenContractAddress = e.target.proposalFT.value;
             const amountTokens = amount.mul('1e' + ftMetadata.decimals).toFixed();
 
-            await window.contract.add_proposal(
-              {
+            await callMethod({
+              contractId: stateCtx.config.contract,
+              method: 'add_proposal',
+              args: {
                 proposal: {
                   description: e.target.proposalDescription.value.trim(),
                   kind: {
@@ -1032,9 +1026,9 @@ const Dao = () => {
                   }
                 }
               },
-              new Decimal('30000000000000').toString(),
-              daoPolicy.proposal_bond.toString()
-            );
+              gas: new Decimal('30000000000000').toString(),
+              deposit: daoPolicy.proposal_bond.toString()
+            })
           } else {
             const amountYokto = amount.mul(yoktoNear).toFixed();
             // Handle case of NEAR streams
@@ -1238,14 +1232,32 @@ const Dao = () => {
       }
 
       let r = null;
+
       if (paymentOption === 'FT') {
         const token = e.target.proposalFT.value.split('.');
+        const contractId = token[1] + '.' + token[2];
+
         if (token.length === 3) {
-          r = await viewMethod({ contractId: token[1] + '.' + token[2], method: 'get_token', args: { token_id: token[0] }}).then((r) => {
+          r = await viewMethod({ contractId, method: 'get_token', args: { token_id: token[0] } }).then((r) => {
             setMetadata(r.metadata.decimals);
           });
         }
       }
+
+      // if (paymentOption === 'FT') {
+      //   const token = e.target.proposalFT.value.split('.');
+      //   if (token.length === 3) {
+      //     const tokenContract = new Contract(
+      //       window.walletConnection.account(),
+      //       token[1] + '.' + token[2],
+      //       {
+      //         viewMethods: ['get_token'],
+      //         changeMethods: []
+      //       }
+      //     );
+      //     r = await tokenContract.get_token({ token_id: token[0] });
+      //   }
+      // }
 
       if (
         (validateTarget &&
